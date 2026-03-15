@@ -42,7 +42,7 @@ jobs:
 
       # Step 4: Run ESLint
       - name: Run ESLint
-        run: npm run lint
+        run: npx eslint .
 
       # Step 5: Run Tests with Coverage
       - name: Run Tests
