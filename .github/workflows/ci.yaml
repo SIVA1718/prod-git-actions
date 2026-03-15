@@ -2,13 +2,18 @@ name: Next.js CI
 
 on:
   push:
-    branches: [ master,develop ]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ master,develop ]
+    branches: [ master, develop ]
+  
+  workflow_dispatch:
+    
+
 env:
   NODE_ENV: ${{ secrets.NODE_ENV }}
   USERNAME: ${{ secrets.USERNAME }}
   API_KEY: ${{ secrets.API_KEY }}
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -18,40 +23,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Step 2: Test secrets logging
       - name: Test secrets logging
         run: |
           echo "Testing if secrets are accessible:"
           echo "NODE_ENV: ${{ secrets.NODE_ENV != '' && '✅ Set' || '❌ Not set' }}"
           echo "USERNAME: ${{ secrets.USERNAME != '' && '✅ Set' || '❌ Not set' }}"
           echo "API_KEY: ${{ secrets.API_KEY != '' && '✅ Set' || '❌ Not set' }}"
-        
-        # This will show as *** in logs (automatically masked by GitHub)
-        echo "NODE_ENV value: $NODE_ENV"
-        echo "USERNAME value: $USERNAME" 
-        echo "API_KEY value: $API_KEY"
+          
+          # This will show as *** in logs (automatically masked by GitHub)
+          echo "NODE_ENV value: $NODE_ENV"
+          echo "USERNAME value: $USERNAME" 
+          echo "API_KEY value: $API_KEY"
 
-      # Step 2: Setup Node.js
+      # Step 3: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
 
-      # Step 3: Install dependencies
+      # Step 4: Install dependencies (with dev dependencies)
       - name: Install dependencies
         working-directory: next-app
+        env:
+          NODE_ENV: development  # Override to ensure dev dependencies are installed
         run: npm ci
 
-      # Step 4: Run ESLint
+      # Step 5: Run ESLint
       - name: Run ESLint
         working-directory: next-app
         run: npm run lint
 
-      # Step 5: Run Tests with Coverage
+      # Step 6: Run Tests
       - name: Run Tests
         working-directory: next-app
         run: npm run test
 
-      # Step 6: Build Next.js app
+      # Step 7: Build Next.js app
       - name: Build Application
         working-directory: next-app
         run: npm run build
