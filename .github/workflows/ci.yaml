@@ -2,18 +2,9 @@ name: Next.js CI
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master,develop ]
   pull_request:
-    branches: [ master, develop ]
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:  # Manual trigger
-  schedule:
-    - cron: '50 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
-
-env:
-  NODE_ENV: ${{ secrets.NODE_ENV }}     
-  USERNAME: ${{ secrets.USERNAME }}       
-  API_KEY: ${{ secrets.API_KEY }}  
+    branches: [ master,develop ]
 
 jobs:
   ci:
@@ -32,32 +23,20 @@ jobs:
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm ci  # Installs dependencies from package-lock.json
-        working-directory: next-app  # Ensure we are in the 'next-app' folder
+        working-directory: next-app
+        run: npm ci
 
       # Step 4: Run ESLint
       - name: Run ESLint
-        run: npm run lint  # Runs the eslint command
-        working-directory: next-app  # Ensure we run ESLint inside 'next-app'
+        working-directory: next-app
+        run: npm run lint
 
-      # Step 5: Run Tests
+      # Step 5: Run Tests with Coverage
       - name: Run Tests
-        run: npm run test  # Runs the test command
-        working-directory: next-app  # Ensure we run tests inside 'next-app'
+        working-directory: next-app
+        run: npm run test
 
       # Step 6: Build Next.js app
       - name: Build Application
-        run: npm run build  # Builds the Next.js application
-        working-directory: next-app  # Ensure we build inside 'next-app'
-
-      # Step 7: Show context & variables (for debug)
-      - name: Show context and variables
-        run: |
-          echo "Event: $GITHUB_EVENT_NAME"
-          echo "Branch/Ref: $GITHUB_REF"
-          echo "PR source branch: $GITHUB_HEAD_REF"
-          echo "PR target branch: $GITHUB_BASE_REF"
-          echo "Workflow NODE_ENV: $NODE_ENV"
-          echo "Workflow USERNAME: $USERNAME"
-          echo "API_KEY: $API_KEY (masked automatically)"
-        working-directory: next-app  # Ensure we run the debug commands inside 'next-app'
+        working-directory: next-app
+        run: npm run build
