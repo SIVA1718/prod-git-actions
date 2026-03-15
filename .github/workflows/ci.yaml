@@ -5,9 +5,7 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
-  
   workflow_dispatch:
-
 
 jobs:
   ci:
@@ -28,8 +26,6 @@ jobs:
       # Step 4: Install dependencies (with dev dependencies)
       - name: Install dependencies
         working-directory: next-app
-        env:
-          NODE_ENV: development  # Override to ensure dev dependencies are installed
         run: npm ci
 
       # Step 5: Run ESLint
