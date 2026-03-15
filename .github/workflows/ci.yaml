@@ -1,17 +1,15 @@
 name: Next.js CI
 
-# Workflow triggers
 on:
   push:
     branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
     types: [opened, synchronize, reopened]
-  workflow_dispatch:
+  workflow_dispatch:  # Manual trigger
   schedule:
-    - cron: '40 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
+    - cron: '50 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
 
-# Workflow-level variables (not secret)
 env:
   NODE_ENV: ${{ secrets.NODE_ENV }}     
   USERNAME: ${{ secrets.USERNAME }}       
@@ -21,35 +19,42 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: next-app  # Ensure all commands run in the `next-app` folder
-
     steps:
       # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v6
+        working-directory: next-app  # Ensure we are in the 'next-app' folder
 
       # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
+        working-directory: next-app  # Ensure Node.js setup happens in 'next-app'
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm ci
+        working-directory: next-app
+        run: npm ci  # Installs dependencies from package-lock.json
 
-      # Step 5: Run Tests with Coverage
+      # Step 4: Run ESLint
+      - name: Run ESLint
+        working-directory: next-app
+        run: npm run lint  # Runs the eslint command
+
+      # Step 5: Run Tests
       - name: Run Tests
-        run: npm run test
+        working-directory: next-app
+        run: npm run test  # Runs the test command
 
       # Step 6: Build Next.js app
       - name: Build Application
-        run: npm run build
+        working-directory: next-app
+        run: npm run build  # Builds the Next.js application
 
       # Step 7: Show context & variables (for debug)
       - name: Show context and variables
+        working-directory: next-app
         run: |
           echo "Event: $GITHUB_EVENT_NAME"
           echo "Branch/Ref: $GITHUB_REF"
