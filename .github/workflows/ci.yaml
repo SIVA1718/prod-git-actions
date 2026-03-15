@@ -2,41 +2,80 @@ name: Next.js CI
 
 on:
   push:
-    branches: [ master,develop ]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ master,develop ]
+    branches: [ master, develop ]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+  schedule:
+    - cron: '50 13 * * *'
+
+env:
+  NODE_ENV: ${{ secrets.NODE_ENV }}     
+  USERNAME: ${{ secrets.USERNAME }}       
+  API_KEY: ${{ secrets.API_KEY }}  
 
 jobs:
   ci:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
+          cache: 'npm'
+          cache-dependency-path: next-app/package-lock.json
 
-      # Step 3: Install dependencies
+      - name: Check directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Contents:"
+          ls -la
+          echo "Next-app contents:"
+          ls -la next-app/ || echo "next-app directory not found"
+
       - name: Install dependencies
         working-directory: next-app
-        run: npm ci
+        run: |
+          if [ -f "package-lock.json" ]; then
+            echo "Found package-lock.json, using npm ci"
+            npm ci
+          else
+            echo "No package-lock.json found, using npm install"
+            npm install
+          fi
 
-      # Step 4: Run ESLint
+      - name: Verify ESLint installation
+        working-directory: next-app
+        run: |
+          echo "Checking node_modules/.bin:"
+          ls -la node_modules/.bin/ | grep eslint || echo "eslint not found in node_modules/.bin"
+          echo "Checking package.json:"
+          cat package.json | grep -A 5 "devDependencies" || echo "devDependencies not found"
+
       - name: Run ESLint
         working-directory: next-app
-        run: npm run lint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx
 
-      # Step 5: Run Tests with Coverage
       - name: Run Tests
         working-directory: next-app
         run: npm run test
 
-      # Step 6: Build Next.js app
       - name: Build Application
         working-directory: next-app
         run: npm run build
+
+      - name: Show context and variables
+        working-directory: next-app
+        run: |
+          echo "Event: $GITHUB_EVENT_NAME"
+          echo "Branch/Ref: $GITHUB_REF"
+          echo "PR source branch: $GITHUB_HEAD_REF"
+          echo "PR target branch: $GITHUB_BASE_REF"
+          echo "Workflow NODE_ENV: $NODE_ENV"
+          echo "Workflow USERNAME: $USERNAME"
+          echo "API_KEY: $API_KEY (masked automatically)"
