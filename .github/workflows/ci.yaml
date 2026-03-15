@@ -9,7 +9,6 @@ on:
 
 
 env:
-  NODE_ENV: ${{ secrets.NODE_ENV }}
   USERNAME: ${{ secrets.USERNAME }}
   API_KEY: ${{ secrets.API_KEY }}
 
@@ -26,12 +25,10 @@ jobs:
       - name: Test secrets logging
         run: |
           echo "Testing if secrets are accessible:"
-          echo "NODE_ENV: ${{ secrets.NODE_ENV != '' && '✅ Set' || '❌ Not set' }}"
           echo "USERNAME: ${{ secrets.USERNAME != '' && '✅ Set' || '❌ Not set' }}"
           echo "API_KEY: ${{ secrets.API_KEY != '' && '✅ Set' || '❌ Not set' }}"
           
           # This will show as *** in logs (automatically masked by GitHub)
-          echo "NODE_ENV value: $NODE_ENV"
           echo "USERNAME value: $USERNAME" 
           echo "API_KEY value: $API_KEY"
 
