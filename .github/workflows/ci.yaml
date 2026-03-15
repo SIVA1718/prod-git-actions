@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
   schedule:
-    - cron: '20 13 * * *'  # daily 6:50 PM IST
+  - cron: '30 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
 
 # Workflow-level variables (not secret)
 env:
