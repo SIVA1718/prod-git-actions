@@ -5,6 +5,7 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ master, develop ]
+  workflow_dispatch:
 
 jobs:
   ci:
@@ -15,28 +16,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # Step 2: Setup Node.js
+
+      # Step 3: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
 
-      # Step 3: Install dependencies
+      # Step 4: Install dependencies (with dev dependencies)
       - name: Install dependencies
         working-directory: next-app
         run: npm ci
 
-      # Step 4: Run ESLint
+      # Step 5: Run ESLint
       - name: Run ESLint
         working-directory: next-app
         run: npm run lint
 
-      # Step 5: Run Tests with Coverage
+      # Step 6: Run Tests
       - name: Run Tests
         working-directory: next-app
         run: npm run test
 
-      # Step 6: Build Next.js app
+      # Step 7: Build Next.js app
       - name: Build Application
         working-directory: next-app
         run: npm run build
