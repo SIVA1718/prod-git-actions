@@ -1,6 +1,5 @@
 name: Next.js CI
 
-# Trigger workflow on push or pull request to master
 on:
   push:
     branches: [ master ]
@@ -11,12 +10,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: next-app
-
     steps:
-      # Step 1: Checkout repo
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -25,20 +20,23 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: 'npm' # Caches node_modules for faster installs
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm install
+        working-directory: next-app
+        run: npm ci
 
       # Step 4: Run ESLint
       - name: Run ESLint
+        working-directory: next-app
         run: npm run lint
 
       # Step 5: Run Tests with Coverage
       - name: Run Tests
+        working-directory: next-app
         run: npm run test
 
       # Step 6: Build Next.js app
       - name: Build Application
+        working-directory: next-app
         run: npm run build
