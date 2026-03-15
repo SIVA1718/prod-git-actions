@@ -9,7 +9,7 @@ on:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
   schedule:
-  - cron: '30 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
+    - cron: '40 13 * * *'  # daily at 7:00 PM IST (1:30 PM UTC)
 
 # Workflow-level variables (not secret)
 env:
@@ -23,10 +23,10 @@ jobs:
 
     defaults:
       run:
-        working-directory: next-app
+        working-directory: next-app  # Ensure all commands run in the `next-app` folder
 
     steps:
-      # Step 1: Checkout repository
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v6
 
@@ -44,7 +44,7 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      # Step 5: Run Tests
+      # Step 5: Run Tests with Coverage
       - name: Run Tests
         run: npm run test
 
